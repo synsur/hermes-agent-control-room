@@ -26,6 +26,9 @@ Use this checklist for the VPS and all agents.
 - [ ] Every agent has `inventory.md`, `docker.md`, `env-map.md`, `runbook.md`, and `backup.md`.
 - [ ] `env-map.md` records secret locations and scopes only.
 - [ ] Runbooks explain restart, upgrade, restore, and key rotation.
+- [ ] Runtime state stays outside the repo.
+- [ ] Codex handoffs do not include raw secret values.
+- [ ] Heavy repo execution is routed to Codex where possible instead of external model providers.
 
 ## Key Rotation
 

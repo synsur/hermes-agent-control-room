@@ -12,6 +12,19 @@ It gives you a clean path from:
 one agent -> direct specialists -> orchestrator -> automated agent team
 ```
 
+## Operating Model
+
+This repo is built around a practical split:
+
+```text
+Hermes       = personal coordination brain
+Codex        = execution engine for implementation, debugging, tests, and repo changes
+Control Room = source of truth for docs, registry, runbooks, templates, and recovery notes
+Runtime      = live state outside the repo
+```
+
+Use Hermes for planning, memory, prioritization, review, and routing. Use Codex when the work needs code execution, debugging, test runs, or repo edits. Use the Control Room to keep the system understandable and recoverable. Keep `.env` values, sessions, logs, OAuth tokens, and live databases out of the repo.
+
 ## About
 
 Hermes Agent Control Room is a starter kit for people who want to run Hermes agents like an operating system instead of a pile of disconnected bots.
@@ -19,7 +32,7 @@ Hermes Agent Control Room is a starter kit for people who want to run Hermes age
 The repo gives you:
 
 - A control-plane folder structure for documenting agents.
-- Templates for agent runbooks, Docker notes, secret maps, and backups.
+- Templates for agent inventory, runbooks, Docker notes, env maps, backups, and handoffs.
 - A level-based architecture for growing from one agent to a specialist team.
 - A task bus pattern for orchestrator-to-specialist delegation.
 - Bundled setup and operations skills an agent can use to build or manage the system.
@@ -44,6 +57,7 @@ Agent Control Room = side control plane
 Orchestrator       = optional manager/front-door agent
 Specialists        = focused Hermes agents with role-specific tools
 Task Bus           = handoff desk between orchestrator and specialists
+Codex              = execution engine for repo work
 You                = owner/operator with direct access to everything
 ```
 
@@ -58,10 +72,11 @@ flowchart LR
   orch["hermes-orchestrator<br/><br/>optional front door<br/>delegation / synthesis"]
 
   bus["Agent Task Bus<br/><code>/srv/agent-bus</code><br/><br/>inbox / working<br/>outbox / archive"]
+  codex["Codex<br/><br/>execution engine<br/>implementation / debugging<br/>tests / repo changes"]
 
   life["hermes-life<br/>personal agent"]
   seo["hermes-seo<br/>SEO specialist"]
-  dev["hermes-dev<br/>code / site work"]
+  dev["hermes-dev<br/>dev coordination"]
   cmo["hermes-cmo<br/>marketing"]
   ops["hermes-ops<br/>VPS / backups / security"]
 
@@ -71,6 +86,7 @@ flowchart LR
   user -->|"direct path"| seo
   user -->|"direct path"| dev
   user -->|"direct path"| cmo
+  user -->|"execution path"| codex
 
   control -. "defines / documents / governs" .-> orch
   control -. "defines / documents / governs" .-> life
@@ -78,16 +94,20 @@ flowchart LR
   control -. "defines / documents / governs" .-> dev
   control -. "defines / documents / governs" .-> cmo
   control -. "defines / documents / governs" .-> ops
+  control -. "handoff templates / repo rules" .-> codex
 
   orch -->|"routes tasks"| bus
+  orch -->|"repo execution handoff"| codex
   bus --> seo
   bus --> dev
   bus --> cmo
   bus --> ops
+  dev -->|"repo execution handoff"| codex
   seo -->|"results"| bus
   dev -->|"results"| bus
   cmo -->|"results"| bus
   ops -->|"results"| bus
+  codex -->|"changes / test results"| user
   bus -->|"summaries / artifacts"| orch
   orch -->|"final synthesis"| user
 ```
@@ -187,7 +207,8 @@ agent-team-cron-planner
 agent-control-room/
   README.md
   agents/
-    .gitkeep
+    README.md
+    <agent-name>/
   docs/
     architecture.md
     levels.md
@@ -212,6 +233,7 @@ agent-control-room/
       docker-compose.orchestrator.yml
     task-bus/
       agents.yaml
+      handoff-template.md
       task-template.md
       result-template.md
   skills/
@@ -375,6 +397,13 @@ Keep the control plane separate from live runtime state.
 /srv/<agent-name>/data
   live Hermes runtime
   .env, memory, skills, sessions, crons, logs
+```
+
+Task-bus runtime state also stays outside the repo:
+
+```text
+/srv/agent-bus
+  live inbox, working, outbox, and archive files
 ```
 
 ## Security Rule

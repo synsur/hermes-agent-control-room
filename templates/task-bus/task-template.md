@@ -13,20 +13,38 @@ requires_approval_before:
   - destructive operations
 ---
 
-# Task
+# Task Handoff
 
-Describe the task.
+Use this when an orchestrator or operator hands bounded work to a specialist.
 
-# Context
+## Task
+
+Describe the task in one or two sentences.
+
+## Context
 
 Add relevant context and paths.
 
-# Constraints
+## Source Of Truth
+
+- Control Room docs:
+- Runtime path if needed:
+- Repo path if needed:
+- Related issue/PR:
+
+## Execution Boundary
+
+- Use Hermes for coordination, memory, prioritization, and review.
+- Use Codex for code changes, debugging, tests, and repo edits.
+- Do not route heavy implementation loops through OpenRouter when Codex can execute locally.
+
+## Constraints
 
 - Do not expose secrets.
 - Do not perform destructive operations without approval.
+- Do not publish, deploy, rotate credentials, or spend money without approval.
 
-# Expected Output
+## Expected Output
 
 - Findings
 - Files changed or artifacts created

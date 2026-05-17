@@ -1,85 +1,99 @@
 # Starter Guide
 
-This template is Control Room first.
+Use this repo as the operating manual for your agent system.
 
-Recommended order:
+The default workflow is:
 
 ```text
-1. Create a VPS or choose an existing one.
-2. Bootstrap the Agent Control Room.
-3. Register one Hermes agent.
-4. Add direct specialist agents when roles become clear.
-5. Add an orchestrator when you want one front door.
-6. Automate only after the manual workflow works.
+Hermes decides and remembers.
+Codex executes code work.
+The Control Room records how the system is supposed to run.
+Runtime state stays outside the repo.
 ```
 
-## Step 1: Create Or Choose A VPS
+## 1. Clone The Control Room
 
-Use any Ubuntu/Debian server you can SSH into.
-
-Recommended starting point:
-
-- Ubuntu 24.04 LTS
-- 2 vCPU / 4GB RAM minimum
-- 4 vCPU / 8GB RAM if running several agents, browser automation, or heavier crons
-- SSH key access
-
-If you are provisioning on Hetzner, use the bundled `create-vps` skill to create the VPS, SSH key, and local SSH alias before this template is installed.
-
-## Step 2: Bootstrap The Control Room
-
-On the VPS, clone this repo:
+On the VPS or workstation that will hold the docs:
 
 ```bash
 git clone https://github.com/shannhk/hermes-agent-control-room.git /root/agent-control-room
+cd /root/agent-control-room
 ```
 
-Then install the tools you want on the VPS:
+If you are starting from a fresh VPS, use the bundled `create-vps` and `setup-control-room` skills to provision the server and install the basic tools.
 
-- Node.js
-- Claude Code
-- Codex CLI
-- Docker
-- Hermes Agent
+## 2. Read The Core Docs
 
-The bundled `setup-control-room` skill describes an automated bootstrap flow for this.
-
-If you are starting from nothing, the paired flow is:
+Read these first:
 
 ```text
-create-vps
-  -> creates the server and SSH alias
-
-setup-control-room
-  -> installs tooling and clones this template
+docs/architecture.md
+docs/levels.md
+docs/security.md
+docs/naming.md
 ```
 
-## Step 3: Register One Agent
+Keep this rule in mind:
 
-Copy the agent template:
+```text
+/root/agent-control-room = docs, templates, registry, recovery notes
+/srv/<agent-name>/data = live runtime state and secrets
+```
+
+## 3. Register Your First Hermes Agent
+
+Start with one personal coordination agent, usually `hermes-life`.
 
 ```bash
-mkdir -p /root/agent-control-room/agents/hermes-life
-cp /root/agent-control-room/templates/agent/*.md /root/agent-control-room/agents/hermes-life/
+mkdir -p agents/hermes-life
+cp templates/agent/*.md agents/hermes-life/
 ```
 
-Edit the five docs:
+Fill in:
 
 ```text
-inventory.md
-docker.md
-env-map.md
-runbook.md
-backup.md
+agents/hermes-life/inventory.md
+agents/hermes-life/docker.md
+agents/hermes-life/env-map.md
+agents/hermes-life/runbook.md
+agents/hermes-life/backup.md
 ```
 
-Do not put raw secrets in these files.
+Do not paste raw secrets into any of these files. Record secret names, scopes, providers, and runtime locations only.
 
-## Step 4: Add Direct Specialists
+## 4. Use The Daily Operating Loop
 
-Once one agent works, add specialists only when the role is clear.
+For planning and priorities:
 
-Examples:
+```text
+Ask Hermes.
+```
+
+For implementation, debugging, tests, and repo edits:
+
+```text
+Hand the task to Codex with a clear brief.
+Use templates/task-bus/handoff-template.md when useful.
+```
+
+For durable system updates:
+
+```text
+Update the Control Room docs.
+```
+
+For live state, logs, sessions, or `.env` values:
+
+```text
+Use /srv/<agent-name>/data or the relevant runtime system.
+Do not copy live state into the repo.
+```
+
+## 5. Add Specialists Only When Needed
+
+Add direct specialists when the role needs separate memory, tools, credentials, ports, or crons.
+
+Common names:
 
 ```text
 hermes-seo
@@ -88,23 +102,54 @@ hermes-cmo
 hermes-ops
 ```
 
-Each specialist should have its own Docker container, data dir, memory, skills, credentials, and docs folder.
+Each specialist gets its own:
 
-## Step 5: Add An Orchestrator
+- docs folder in `agents/<agent-name>/`
+- runtime data dir in `/srv/<agent-name>/data`
+- `.env`
+- ports
+- backup plan
+- allowed and forbidden work list
 
-Add an orchestrator only when it is annoying to remember which specialist to ask.
+## 6. Add An Orchestrator Later
 
-The orchestrator should follow the Control Room. It should not become a giant agent with every credential.
+Add `hermes-orchestrator` only when one front door would reduce overhead.
 
-## Step 6: Automate Later
+The orchestrator should:
 
-Do not start with automation.
+- read the Control Room
+- route work through the task bus
+- synthesize results
+- ask for approval before sensitive operations
 
-First prove the manual workflow:
+The orchestrator should not become the one agent with every credential.
 
-```text
-You -> specialist
-You -> orchestrator -> specialist
-```
+## 7. Automate Last
 
-Then add recurring workflows, security audits, backup checks, and task routing.
+Automate only after manual delegation works.
+
+Good early automations:
+
+- backup checks
+- security checklist reminders
+- weekly summaries
+- stale task cleanup
+
+Require explicit approval for:
+
+- deploys
+- destructive operations
+- credential rotation
+- public publishing
+- spending money
+
+## First Milestone
+
+You are ready to move beyond Level 1 when:
+
+- [ ] One Hermes agent is documented in `agents/<agent-name>/`.
+- [ ] You can restart and debug it from `runbook.md`.
+- [ ] `env-map.md` records secret locations without values.
+- [ ] `backup.md` explains what to include and exclude.
+- [ ] Codex handoffs are clear for repo execution work.
+- [ ] `git status` shows no accidental runtime files or secrets.

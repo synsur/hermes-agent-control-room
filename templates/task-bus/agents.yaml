@@ -1,11 +1,52 @@
+# Agent registry template.
+# Keep live secrets out of this file. Put runtime values in each agent's env-map.md.
 agents:
+  hermes-life:
+    role: Personal coordination agent
+    docs: /root/agent-control-room/agents/hermes-life
+    data_dir: /srv/hermes-life/data
+    task_queue: null
+    gateway_url: http://127.0.0.1:8642
+    dashboard_url: http://127.0.0.1:9119
+    coordination_layer: hermes
+    execution_layer: codex_for_repo_work
+    allowed_work:
+      - personal planning
+      - prioritization
+      - memory and review
+      - routing work to specialists or Codex
+    forbidden_work:
+      - storing raw secrets in the Control Room
+      - destructive operations without approval
+
+  hermes-orchestrator:
+    role: Optional front door for routing and synthesis
+    docs: /root/agent-control-room/agents/hermes-orchestrator
+    data_dir: /srv/hermes-orchestrator/data
+    task_queue: /srv/agent-bus
+    gateway_url: http://127.0.0.1:8644
+    dashboard_url: http://127.0.0.1:9121
+    coordination_layer: hermes
+    execution_layer: codex_for_repo_work
+    allowed_work:
+      - routing tasks
+      - writing handoffs
+      - reviewing specialist results
+      - synthesis
+    forbidden_work:
+      - holding every specialist credential
+      - publishing or deploying without approval
+      - credential rotation without approval
+
   hermes-seo:
     role: SEO specialist
-    docs: /root/vps-agents/agents/hermes-seo
+    docs: /root/agent-control-room/agents/hermes-seo
     data_dir: /srv/hermes-seo/data
     task_queue: /srv/agent-bus/tasks/seo
     gateway_url: http://127.0.0.1:8643
     dashboard_url: http://127.0.0.1:9120
+    coordination_layer: hermes
+    execution_layer: codex_for_repo_work
     allowed_work:
       - technical SEO audits
       - content briefs
@@ -15,15 +56,18 @@ agents:
       - credential rotation without approval
 
   hermes-dev:
-    role: Code and site specialist
-    docs: /root/vps-agents/agents/hermes-dev
+    role: Development coordination specialist
+    docs: /root/agent-control-room/agents/hermes-dev
     data_dir: /srv/hermes-dev/data
     task_queue: /srv/agent-bus/tasks/dev
     gateway_url: http://127.0.0.1:8646
     dashboard_url: http://127.0.0.1:9123
+    coordination_layer: hermes
+    execution_layer: codex
     allowed_work:
-      - code changes
-      - debugging
-      - pull requests
+      - implementation planning
+      - code review coordination
+      - Codex handoff preparation
     forbidden_work:
       - production deploys without approval
+      - committing raw secrets
